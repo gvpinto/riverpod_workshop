@@ -9,23 +9,24 @@ void main() {
   );
 }
 
-final greetingProvider = Provider((ref) => 'Hello RiverPod!!');
+final greetingProvider = Provider((ref) => 'Hello RiverPod!!!');
 
 // ignore: use_key_in_widget_constructors
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final greeting = ref.watch(greetingProvider);
-
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Riverpod Tutorial',
       home: Scaffold(
         appBar: AppBar(
           title: const Text('RiverPod Tutorial'),
         ),
-        body: Center(
-          child: Text(greeting),
-        ),
+        body: Consumer(builder: (context, ref, child) {
+          final greeting = ref.watch(greetingProvider);
+          return Center(
+            child: Text(greeting),
+          );
+        }),
       ),
     );
   }
