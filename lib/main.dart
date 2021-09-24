@@ -9,7 +9,17 @@ void main() {
   );
 }
 
-final greetingProvider = Provider((ref) => 'Hello RiverPod!!!');
+class IncrementNotifier extends ChangeNotifier {
+  int _value = 0;
+  int get value => _value;
+
+  void increment() {
+    _value++;
+    notifyListeners();
+  }
+}
+
+final incrementProvider = ChangeNotifierProvider((ref) => IncrementNotifier());
 
 // ignore: use_key_in_widget_constructors
 class MyApp extends StatelessWidget {
@@ -21,12 +31,18 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text('RiverPod Tutorial'),
         ),
-        body: Consumer(builder: (context, ref, child) {
-          final greeting = ref.watch(greetingProvider);
-          return Center(
-            child: Text(greeting),
-          );
-        }),
+        body: Center(
+          child: Consumer(builder: (context, watch, child) {
+            final incrementNotifier = watch(incrementProvider);
+            return Text(incrementNotifier.value.toString());
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.read(incrementProvider).increment();
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
