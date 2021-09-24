@@ -9,41 +9,37 @@ void main() {
   );
 }
 
-class IncrementNotifier extends ChangeNotifier {
-  int _value = 0;
-  int get value => _value;
-
-  void increment() {
-    _value++;
-    notifyListeners();
-  }
-}
-
-final incrementProvider = ChangeNotifierProvider((ref) => IncrementNotifier());
+final firstStringProvider = Provider((ref) => 'First');
+final secondStringProvider = Provider((ref) => 'Second');
 
 // ignore: use_key_in_widget_constructors
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader watch) {
+    final first = watch(firstStringProvider);
+    final second = watch(secondStringProvider);
     return MaterialApp(
       title: 'Riverpod Tutorial',
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('RiverPod Tutorial'),
-        ),
-        body: Center(
-          child: Consumer(builder: (context, watch, child) {
-            final incrementNotifier = watch(incrementProvider);
-            return Text(incrementNotifier.value.toString());
-          }),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            context.read(incrementProvider).increment();
-          },
-          child: const Icon(Icons.add),
-        ),
-      ),
+          appBar: AppBar(
+            title: const Text('RiverPod Tutorial'),
+          ),
+          body: Column(
+            children: [
+              Text(
+                first,
+                style: const TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              Text(
+                second,
+                style: const TextStyle(
+                  fontSize: 30,
+                ),
+              )
+            ],
+          )),
     );
   }
 }
