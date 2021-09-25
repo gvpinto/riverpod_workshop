@@ -18,7 +18,7 @@ class FakeHttpClient {
 
 final fakeHttpClientProvider = Provider((ref) => FakeHttpClient());
 final responseProvider =
-    FutureProvider.family<String, String>((ref, url) async {
+    FutureProvider.autoDispose.family<String, String>((ref, url) async {
   final httpClient = ref.read(fakeHttpClientProvider);
   return httpClient.get(url);
 });
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           child: Consumer(
             builder: (context, watch, child) {
               final responseAsyncValue =
-                  watch(responseProvider('https://www.youtube.com'));
+                  watch(responseProvider('https://www.google.com'));
               return responseAsyncValue.map(
                 data: (_) => Text(_.value),
                 loading: (_) => const CircularProgressIndicator(),
