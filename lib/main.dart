@@ -9,37 +9,45 @@ void main() {
   );
 }
 
-final firstStringProvider = Provider((ref) => 'First');
-final secondStringProvider = Provider((ref) => 'Second');
+class FakeHttpClient {
+  Future<String> get(String url) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return 'Response from $url';
+  }
+}
 
-// ignore: use_key_in_widget_constructors
-class MyApp extends ConsumerWidget {
+final fakeHttpClientProvider = Provider((ref) => FakeHttpClient());
+final responseProvider =
+    FutureProvider.family<String, String>((ref, url) async {
+  final httpClient = ref.read(fakeHttpClientProvider);
+  return httpClient.get(url);
+});
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final first = watch(firstStringProvider);
-    final second = watch(secondStringProvider);
+  Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Riverpod Tutorial',
+      title: 'RiverPod tutorial',
       home: Scaffold(
-          appBar: AppBar(
-            title: const Text('RiverPod Tutorial'),
+        body: Center(
+          child: Consumer(
+            builder: (context, watch, child) {
+              final responseAsyncValue =
+                  watch(responseProvider('https://www.youtube.com'));
+              return responseAsyncValue.map(
+                data: (_) => Text(_.value),
+                loading: (_) => const CircularProgressIndicator(),
+                error: (_) => Text(
+                  _.error.toString(),
+                  style: const TextStyle(color: Colors.red),
+                ),
+              );
+            },
           ),
-          body: Column(
-            children: [
-              Text(
-                first,
-                style: const TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-              Text(
-                second,
-                style: const TextStyle(
-                  fontSize: 30,
-                ),
-              )
-            ],
-          )),
+        ),
+      ),
     );
   }
 }
